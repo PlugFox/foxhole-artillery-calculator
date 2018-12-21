@@ -1,3 +1,3 @@
-# foxhole-artillery-calculator
+# Foxhole artillery calculator
 
-Foxhole artillery calculator
+Example: http://www.foxhole-arty.com/
