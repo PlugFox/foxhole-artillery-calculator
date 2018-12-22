@@ -1,0 +1,107 @@
+﻿<Window x:Class="foxhole_artillery_calculator.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:foxhole_artillery_calculator"
+        mc:Ignorable="d"
+        Title="Калькулятор артиллериста" Height="400" Width="220" Visibility="Visible" WindowStyle="None" 
+        ScrollViewer.VerticalScrollBarVisibility="Disabled" VerticalContentAlignment="Center" 
+        HorizontalContentAlignment="Center" AllowsTransparency="True" Background="Transparent"
+        MouseLeftButtonDown="WindowMouseLeftButtonDown" FontSize="16" SizeToContent="Height" Topmost="True" FontWeight="Bold">
+    <x:Code>
+        <![CDATA[            
+            private void WindowMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+                {
+                    try
+                    {
+                        DragMove();
+                    }
+                    catch (Exception err)
+                    {
+                        Console.WriteLine("{0} Exception caught.", err);        
+                    }
+                }
+        ]]>
+    </x:Code>
+    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Vertical">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" Margin="0 0 0 2">
+            <Image Height="20px" Width="175px" Source="img/Header.png" Stretch="Fill" />
+            <Button Height="20px" Width="20px" Margin="2 0 0 0" BorderThickness="0" HorizontalAlignment="Center" VerticalAlignment="Center" Cursor="Cross" ToolTip="ВЫХОД" Tag="ВЫХОД" Click="Button_Exit" >
+                <Button.Background>
+                    <ImageBrush ImageSource="img/exit.png"/>
+                </Button.Background>
+            </Button>
+        </StackPanel>
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Left" Orientation="Vertical" Width="150px">
+                <GroupBox Header="Враги (Num -)" Foreground="White" x:Name="enemyGroup" Background="Transparent" FontSize="12" Margin="0 0 0 2">
+                    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Vertical">
+                        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" ToolTip="Дистанция от наводчика до врага.">
+                            <Label Content="Дист. " Foreground="Red" Margin="0"  FontSize="16"/>
+                            <Label x:Name="enemyDistanceLBL" Foreground="Red" HorizontalAlignment="Stretch" Margin="10,0" Width="40px" FontSize="16" Background="Transparent" BorderBrush="Transparent" />
+                            <Label Content="м" Foreground="Red" Margin="0"  FontSize="16"/>
+                        </StackPanel>
+                        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" ToolTip="Азимут от наводчика до врага.">
+                            <Label Content="Азим." Foreground="Red" Margin="0"  FontSize="16"/>
+                            <Label x:Name="enemyAzimuthLBL" Foreground="Red" HorizontalAlignment="Stretch" Margin="10,0" Width="40px" FontSize="16" Background="Transparent" BorderBrush="Transparent" />
+                            <Label Content="°" Foreground="Red" Margin="0"  FontSize="16"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="Союзники (Num +)" Foreground="White" x:Name="friendlyGroup" Background="Transparent" FontSize="12" Margin="0 0 0 2">
+                    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Vertical">
+                        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" ToolTip="Дистанция от наводчика до союзника.">
+                            <Label Content="Дист. " Foreground="Red" Margin="0"  FontSize="16"/>
+                            <Label x:Name="friendlyDistanceLBL" Foreground="Red" HorizontalAlignment="Stretch" Margin="10,0" Width="40px" FontSize="16" Background="Transparent" BorderBrush="Transparent" />
+                            <Label Content="м" Foreground="Red" Margin="0"  FontSize="16"/>
+                        </StackPanel>
+                        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" ToolTip="Азимут от наводчика до союзника.">
+                            <Label Content="Азим." Foreground="Red" Margin="0"  FontSize="16"/>
+                            <Label x:Name="friendlyAzimuthLBL" Foreground="Red" HorizontalAlignment="Stretch" Margin="10,0" Width="40px" FontSize="16" Background="Transparent" BorderBrush="Transparent" />
+                            <Label Content="°" Foreground="Red" Margin="0"  FontSize="16"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="Союзники 🎯 враги" Foreground="White" x:Name="targetGroup" Background="Transparent" FontSize="12" Margin="0 0 0 2">
+                    <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Vertical">
+                        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" ToolTip="Дистанция от союзника до союзника.">
+                            <Label Content="Дист. " Foreground="Red" Margin="0"  FontSize="16" BorderBrush="Black" Background="{x:Null}"/>
+                            <Label x:Name="targetDistanceLBL" Foreground="Red" HorizontalAlignment="Stretch" Margin="10,0" Width="40px" FontSize="16" Background="Transparent" BorderBrush="Transparent" />
+                            <Label Content="м" Foreground="Red" Margin="0"  FontSize="16"/>
+                        </StackPanel>
+                        <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" ToolTip="Азимут от союзника до союзника.">
+                            <Label Content="Азим." Foreground="Red" Margin="0"  FontSize="16"/>
+                            <Label x:Name="targetAzimuthLBL" Foreground="Red" HorizontalAlignment="Stretch" Margin="10,0" Width="40px" FontSize="16" Background="Transparent" BorderBrush="Transparent" />
+                            <Label Content="°" Foreground="Red" Margin="0"  FontSize="16"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" Margin="0 0 0 2">
+                    <Image Width="30px" Height="30px" Source="img/Mortar.png" Cursor="Help" ToolTip="Дистанция: 45-65 м." ToolTipService.InitialShowDelay="500"/>
+                    <Image Width="30px" Height="30px" Source="img/Field_Artillery.png" Cursor="Help" ToolTip="Дистанция: 75-150 м." ToolTipService.InitialShowDelay="500"/>
+                    <Image Width="30px" Height="30px" Source="img/Howitzer.png" Cursor="Help" ToolTip="Дистанция: 75-150 м." ToolTipService.InitialShowDelay="500"/>
+                    <Image Width="30px" Height="30px" Source="img/Gunship.png" Cursor="Help" ToolTip="Дистанция: 50-100 м." ToolTipService.InitialShowDelay="500"/>
+                </StackPanel>
+                
+                <Image Width="100px" Height="50px" x:Name="Screenshot" Margin="0,10,0,10"/>
+            </StackPanel>
+
+            <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Orientation="Vertical" Width="45px" Margin="5,0,0,0">
+                <Border Width="45px" Height="60px" Margin="0,10,0,0" CornerRadius="5" Padding="0" Background="#3FFF0000" BorderThickness="2" BorderBrush="White">
+                    <Label MouseDown="Label_MouseDown" Foreground="White"/>
+                </Border>
+                <Border Width="45px" Height="60px" Margin="0,5,0,0" CornerRadius="5" Padding="0" Background="#3F00FF00" BorderThickness="2" BorderBrush="White">
+                    <Label MouseDown="Label_MouseDown" Foreground="White"/>
+                </Border>
+                <Border Width="45px" Height="60px" Margin="0,5,0,0" CornerRadius="5" Padding="0" Background="#3F0000FF" BorderThickness="2" BorderBrush="White">
+                    <Label MouseDown="Label_MouseDown" Foreground="White"/>
+                </Border>
+                <Border Width="45px" Height="60px" Margin="0,5,0,0" CornerRadius="5" Padding="0" Background="#3F7F007F" BorderThickness="2" BorderBrush="White">
+                    <Label MouseDown="Label_MouseDown" Foreground="White"/>
+                </Border>
+            </StackPanel>
+        </StackPanel>
+        
+    </StackPanel>
+</Window>
