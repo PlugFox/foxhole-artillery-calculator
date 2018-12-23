@@ -7,6 +7,7 @@ using System.IO;
 using System.Windows.Media.Imaging;
 using System.Text.RegularExpressions;
 using System.Windows.Controls;
+using System.Speech.Synthesis;
 
 namespace foxhole_artillery_calculator
 {
@@ -103,10 +104,9 @@ namespace foxhole_artillery_calculator
         private void Label_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if (e == null)
-            {
                 return;
-            }
-            ((ContentControl)sender).Content = (targetDistance != 0 || targetAzimuth != 0) ? ("" + targetDistance + Environment.NewLine + targetAzimuth) : ("");
+            ContentControl s = ((ContentControl)sender);
+            s.Content = (targetDistance != 0 || targetAzimuth != 0) ? ("" + targetDistance + Environment.NewLine + targetAzimuth) : ("");
         }
         #endregion
 
@@ -183,6 +183,10 @@ namespace foxhole_artillery_calculator
                 case "snapshot":
                     CaptureScreen();
                     return;
+                //// Если нажали на умножение
+                //case "multiply":
+                //    Say();
+                //    return;
                 default:
                     if (current == Status.none)
                         return;               
@@ -218,6 +222,7 @@ namespace foxhole_artillery_calculator
             }
             return;
         }
+
         // Добавим цифру к текущему полю
         void AddDigit(int digit)
         {
@@ -292,10 +297,8 @@ namespace foxhole_artillery_calculator
             }
             catch
             {
-                result = null;
-            }
-            if (result == null)
                 return;
+            }
 
             using (MemoryStream memory = new MemoryStream())
             {
@@ -309,8 +312,22 @@ namespace foxhole_artillery_calculator
 
                 Screenshot.Source = bitmapimage;
             }
-            return;
         }
+        #endregion
+
+        #region Синтез речи
+        //void Say()
+        //{ 
+        //    // Initialize a new instance of the speech synthesizer.  
+        //    using (SpeechSynthesizer synth = new SpeechSynthesizer())  
+        //    {  
+        //        // Configure the synthesizer to send output to the default audio device.  
+        //        synth.SetOutputToDefaultAudioDevice();  
+
+        //        // Speak a phrase.  
+        //        synth.Speak("142 135");  
+        //    }
+        //}
         #endregion
     }
 }
