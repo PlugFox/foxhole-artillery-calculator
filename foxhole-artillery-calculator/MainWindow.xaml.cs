@@ -8,6 +8,9 @@ using System.Windows.Media.Imaging;
 using System.Text.RegularExpressions;
 using System.Windows.Controls;
 using System.Speech.Synthesis;
+using System.Runtime.InteropServices;
+using System.Diagnostics;
+using System.Windows.Forms;
 
 namespace foxhole_artillery_calculator
 {
@@ -27,7 +30,7 @@ namespace foxhole_artillery_calculator
         // Количество введенных символов в текущее поле
         private int count = 0;
         // Состояние текущего ввода
-        private Status current;
+        private Status currentStatus;
         private enum Status {
             none,
             enemyDistance,
@@ -39,6 +42,23 @@ namespace foxhole_artillery_calculator
         private static readonly Regex regex = new Regex(@"^\d$");
         // Создадим клавиатурный хук
         KeyboardHook keyboardHook = new KeyboardHook();
+
+        // Перемещение окна
+        [DllImport("user32.dll", SetLastError = true)]
+        internal static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
+        // Текущий режим окна
+        private Mode currentMode;
+        private enum Mode
+        {
+            FullScreen,
+            Square
+        };
+        private static int screenWidth = (int)SystemParameters.PrimaryScreenWidth;
+        private static int screenHeight = (int)SystemParameters.PrimaryScreenHeight;
+        // Передний план
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool SetForegroundWindow(IntPtr hWnd);
         #endregion
 
         // Вход
@@ -76,7 +96,7 @@ namespace foxhole_artillery_calculator
             enemyAzimuthLBL.Background = new SolidColorBrush(Colors.Transparent);
             friendlyDistanceLBL.Background = new SolidColorBrush(Colors.Transparent);
             friendlyAzimuthLBL.Background = new SolidColorBrush(Colors.Transparent);
-            switch (current)
+            switch (currentStatus)
             {
                 case Status.enemyDistance:
                     enemyDistanceLBL.Background = new SolidColorBrush(Colors.Lime);
@@ -95,6 +115,12 @@ namespace foxhole_artillery_calculator
             }
 
             return;
+        }
+
+        // Нажатие кнопки свернуть/развернуть
+        private void Button_Turn(object sender, RoutedEventArgs e)
+        {
+            body.Visibility = body.IsVisible ? Visibility.Collapsed : Visibility.Visible;
         }
 
         // Нажатие кнопки выход
@@ -154,12 +180,12 @@ namespace foxhole_artillery_calculator
                 case "subtract":
                     count = 0;
                     enemyAzimuth = 0;
-                    if (current == Status.enemyDistance)
+                    if (currentStatus == Status.enemyDistance)
                     {
-                        current = Status.enemyAzimuth;
+                        currentStatus = Status.enemyAzimuth;
                     } else
                     {
-                        current = Status.enemyDistance;
+                        currentStatus = Status.enemyDistance;
                         enemyDistance = 0;
                     }
                     UpdateInterface();
@@ -168,13 +194,13 @@ namespace foxhole_artillery_calculator
                 case "add":
                     count = 0;
                     friendlyAzimuth = 0;
-                    if (current == Status.friendlyDistance)
+                    if (currentStatus == Status.friendlyDistance)
                     {
-                        current = Status.friendlyAzimuth;
+                        currentStatus = Status.friendlyAzimuth;
                     }
                     else
                     {
-                        current = Status.friendlyDistance;
+                        currentStatus = Status.friendlyDistance;
                         friendlyDistance = 0;
                     }
                     UpdateInterface();
@@ -183,12 +209,12 @@ namespace foxhole_artillery_calculator
                 case "snapshot":
                     CaptureScreen();
                     return;
-                //// Если нажали на умножение
-                //case "multiply":
-                //    Say();
-                //    return;
+                // Если нажали на умножение - меняем разрешение окна фоксхола на квадратное
+                case "multiply":
+                    ChangeResolution();
+                    return;
                 default:
-                    if (current == Status.none)
+                    if (currentStatus == Status.none)
                         return;               
                     break;
             }
@@ -198,16 +224,16 @@ namespace foxhole_artillery_calculator
             if (value.Length != 7 || !regex.IsMatch(value.Substring(6, 1)))
             {
                 count = 0;
-                switch (current)
+                switch (currentStatus)
                 {
                     case Status.enemyDistance:
-                        current = Status.enemyAzimuth;
+                        currentStatus = Status.enemyAzimuth;
                         break;
                     case Status.friendlyDistance:
-                        current = Status.friendlyAzimuth;
+                        currentStatus = Status.friendlyAzimuth;
                         break;
                     default:
-                        current = Status.none;
+                        currentStatus = Status.none;
                         break;
                 }
                 UpdateInterface();
@@ -227,7 +253,7 @@ namespace foxhole_artillery_calculator
         void AddDigit(int digit)
         {
             count++;
-            switch (current)
+            switch (currentStatus)
             {
                 case Status.enemyDistance:
                     enemyDistance *= 10;
@@ -237,7 +263,7 @@ namespace foxhole_artillery_calculator
                     if (count == 3)
                     {
                         count = 0;
-                        current = Status.enemyAzimuth;
+                        currentStatus = Status.enemyAzimuth;
                     }
                     break;
                 case Status.enemyAzimuth:
@@ -248,7 +274,7 @@ namespace foxhole_artillery_calculator
                     if (count == 3)
                     {
                         count = 0;
-                        current = Status.none;
+                        currentStatus = Status.none;
                     }
                     break;
                 case Status.friendlyDistance:
@@ -259,7 +285,7 @@ namespace foxhole_artillery_calculator
                     if (count == 3)
                     {
                         count = 0;
-                        current = Status.friendlyAzimuth;
+                        currentStatus = Status.friendlyAzimuth;
                     }
                     break;
                 case Status.friendlyAzimuth:
@@ -270,7 +296,7 @@ namespace foxhole_artillery_calculator
                     if (count == 3)
                     {
                         count = 0;
-                        current = Status.none;
+                        currentStatus = Status.none;
                     }
                     break;
                 default:
@@ -311,6 +337,48 @@ namespace foxhole_artillery_calculator
                 bitmapimage.EndInit();
 
                 Screenshot.Source = bitmapimage;
+            }
+        }
+        #endregion
+
+        #region Сменить разрешение экрана
+        void ChangeResolution()
+        {
+
+            //IntPtr handle = FindWindow(null, "War");
+
+            Process[] processes = Process.GetProcesses();
+            foreach (var process in processes)
+            {
+                if (!process.ProcessName.StartsWith("War") || process.MainWindowHandle == IntPtr.Zero)
+                    continue;
+                IntPtr handle = process.MainWindowHandle;
+
+                int X;
+                int Y;
+                int nWidth;
+                int nHeight;
+
+                switch (currentMode)
+                {
+                    case Mode.Square:
+                        currentMode = Mode.FullScreen;
+                        nWidth = screenWidth;
+                        nHeight = screenHeight;
+                        X = 0;
+                        Y = 0;
+                        break;
+                    case Mode.FullScreen:
+                    default:
+                        currentMode = Mode.Square;
+                        nWidth = screenHeight * 4 / 3;
+                        nHeight = screenHeight;
+                        X = (screenWidth - screenHeight * 4 / 3) / 2;
+                        Y = 0;
+                        break;
+                }
+                MoveWindow(hWnd: handle, X: X, Y: Y, nWidth: nWidth, nHeight: nHeight, bRepaint: true);
+                SetForegroundWindow(handle);
             }
         }
         #endregion

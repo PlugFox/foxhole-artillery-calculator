@@ -115,9 +115,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="img\Exit.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="img\Mortar.png" />
   </ItemGroup>
   <ItemGroup>
@@ -140,7 +137,13 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="img\Turn.png" />
+  </ItemGroup>
+  <ItemGroup>
     <Resource Include="img\Header.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="img\Exit.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

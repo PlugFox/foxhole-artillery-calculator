@@ -26,14 +26,19 @@
     </x:Code>
     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Vertical">
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" Margin="0 0 0 2">
-            <Image Height="20px" Width="175px" Source="img/Header.png" Stretch="Fill" />
+            <Image Height="20px" Width="170px" Source="img/Header.png" Stretch="Fill" />
+            <Button Height="20px" Width="20px" Margin="2 0 0 0" BorderThickness="0" HorizontalAlignment="Center" VerticalAlignment="Center" Cursor="Cross" ToolTip="СВЕРНУТЬ / РАЗВЕРНУТЬ" Tag="СВЕРНУТЬ / РАЗВЕРНУТЬ" Click="Button_Turn" >
+                <Button.Background>
+                    <ImageBrush ImageSource="img/Turn.png"/>
+                </Button.Background>
+            </Button>
             <Button Height="20px" Width="20px" Margin="2 0 0 0" BorderThickness="0" HorizontalAlignment="Center" VerticalAlignment="Center" Cursor="Cross" ToolTip="ВЫХОД" Tag="ВЫХОД" Click="Button_Exit" >
                 <Button.Background>
-                    <ImageBrush ImageSource="img/exit.png"/>
+                    <ImageBrush ImageSource="img/Exit.png"/>
                 </Button.Background>
             </Button>
         </StackPanel>
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal">
+        <StackPanel x:Name="body" HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Left" Orientation="Vertical" Width="150px">
                 <GroupBox Header="Враги (Num -)" Foreground="White" x:Name="enemyGroup" Background="Transparent" FontSize="12" Margin="0 0 0 2">
                     <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Vertical">
