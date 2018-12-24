@@ -2,7 +2,7 @@ Foxhole
 ---
 # Калькулятор артиллериста
 
-![](screenshots/3.png)
+![](screenshots/5.png)
 
 ```
 Num - :  
