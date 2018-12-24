@@ -9,9 +9,7 @@ using System.Windows.Controls;
 using System.Speech.Synthesis;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
-using System.Windows.Forms;
 using System.Threading.Tasks;
-using System.Threading;
 using System.Globalization;
 using foxhole_artillery_calculator.classes;
 using foxhole_artillery_calculator.screens;
@@ -29,20 +27,20 @@ namespace foxhole_artillery_calculator
         private int enemyAzimuth = 0;
         private int friendlyDistance = 0;
         private int friendlyAzimuth = 0;
-        private int targetDistance = 0;
-        private int targetAzimuth = 0;
+        private double targetDistance = 0;
+        private double targetAzimuth = 0;
         // Количество введенных символов в текущее поле
         private int count = 0;
         // Состояние текущего ввода
-        private Status currentStatus {
-            get => _currentStatus;
+        private Status CurrentStatus {
+            get => _CurrentStatus;
             set
             {
                 //Task.Run(() => Console.Beep(300, 200));
-                _currentStatus = value;
+                _CurrentStatus = value;
             }
         }
-        private Status _currentStatus;
+        private Status _CurrentStatus;
         private enum Status {
             none,
             enemyDistance,
@@ -109,7 +107,7 @@ namespace foxhole_artillery_calculator
                 enemyAzimuthLBL.Background = new SolidColorBrush(Colors.Transparent);
                 friendlyDistanceLBL.Background = new SolidColorBrush(Colors.Transparent);
                 friendlyAzimuthLBL.Background = new SolidColorBrush(Colors.Transparent);
-                switch (currentStatus)
+                switch (CurrentStatus)
                 {
                     case Status.enemyDistance:
                         enemyDistanceLBL.Background = new SolidColorBrush(Colors.Lime);
@@ -157,7 +155,7 @@ namespace foxhole_artillery_calculator
             });
         }
         // Нажатие кнопки озвучки координат
-        private void Sound_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e) => Say(targetDistance, targetAzimuth);
+        private void Sound_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e) => Say((int)targetDistance, (int)targetAzimuth);
         #endregion
 
         #region Считаю координаты цели
@@ -172,25 +170,54 @@ namespace foxhole_artillery_calculator
                 return;
             }
 
+            // Если не заполнена дистанция до союзного орудия - предполагаем, что стоим перед артой.
+            int _friendlyDistance;
+            int _friendlyAzimuth;
+            if (friendlyDistance == 0)
+            {
+                _friendlyDistance = 1;
+                _friendlyAzimuth = (enemyAzimuth > 180) ? 180 + enemyAzimuth : 180 - enemyAzimuth;
+            } else
+            {
+                _friendlyDistance = friendlyDistance;
+                _friendlyAzimuth = friendlyAzimuth;
+            }
+
             // Угол наводчика в радианах
-            double AngleOfSpotter = DegToRad(Math.Abs(enemyAzimuth - friendlyAzimuth));
+            double AngleOfSpotter = DegToRad(Math.Abs(enemyAzimuth - _friendlyAzimuth));
             // Дистанция от союзников до врага
-            targetDistance = (int)Math.Round(Math.Sqrt(Math.Pow(x: enemyDistance, y: 2) + Math.Pow(x: friendlyDistance, y: 2) - (2 * enemyDistance * friendlyDistance * Math.Cos(d: AngleOfSpotter))));
+            targetDistance = Math.Sqrt(Math.Pow(x: enemyDistance, y: 2) + Math.Pow(x: _friendlyDistance, y: 2) - (2 * enemyDistance * _friendlyDistance * Math.Cos(d: AngleOfSpotter)));
 
             // Если азимуты не заполнены, не считаем азимут.
-            if (enemyAzimuth == 0 && friendlyAzimuth == 0)
+            if (enemyAzimuth == 0 && _friendlyAzimuth == 0)
             {
                 targetAzimuth = 0;
                 return;
             }
+
+            // v1.1 begin
             // Угол союзников
-            double friendlyDegree = Math.Round(RadToDeg(Math.Asin((enemyDistance * Math.Sin(AngleOfSpotter)) / targetDistance)));
+            //double friendlyDegree = Math.Round(RadToDeg(Math.Asin((enemyDistance * Math.Sin(AngleOfSpotter)) / targetDistance)));
             // Азимут от союзников до врага
-            targetAzimuth = (int)Math.Round(enemyAzimuth > friendlyAzimuth ? (friendlyAzimuth + 180) - friendlyDegree : (friendlyAzimuth + 180) + friendlyDegree);
-            targetAzimuth = (targetAzimuth > 360) ? (targetAzimuth - 360) : (targetAzimuth < 0 ? targetAzimuth + 360 : targetAzimuth); /// TODO: Тут точно все верно, а то прилетал отрицательный азимут?
+            //targetAzimuth = (int)Math.Round(enemyAzimuth > friendlyAzimuth ? (friendlyAzimuth + 180) - friendlyDegree : (friendlyAzimuth + 180) + friendlyDegree);
+            //targetAzimuth = (targetAzimuth > 360) ? (targetAzimuth - 360) : (targetAzimuth < 0 ? targetAzimuth + 360 : targetAzimuth); /// TODO: Тут точно все верно, а то прилетал отрицательный азимут?
+            // v1.1 end
+
+            // v1.3 begin
+            double step = RadToDeg(Math.Acos((Math.Pow(_friendlyDistance, 2) + Math.Pow(targetDistance, 2) - Math.Pow(enemyDistance, 2)) / (2 * _friendlyDistance * targetDistance)));
+
+            if (ConvertAngle(RadToDeg(AngleOfSpotter)) > 180)
+                targetAzimuth = (enemyAzimuth > _friendlyAzimuth) ? _friendlyAzimuth + 180 + step : _friendlyAzimuth + 180 - step;
+            else
+                targetAzimuth = (enemyAzimuth > _friendlyAzimuth) ? _friendlyAzimuth + 180 - step : _friendlyAzimuth + 180 + step;
+
+            targetAzimuth = ConvertAngle(Math.Round(targetAzimuth, 0));
+            targetDistance = Math.Round(targetDistance, 0);
+            // v1.3 end
         }
         double DegToRad(int deg) => (Math.PI * deg) / 180;
         double RadToDeg(double rad) => (rad * 180) / Math.PI;
+        double ConvertAngle(double deg) => ((deg > 360) ? deg - 360 : deg);
         #endregion
 
         #region Чтение клавиатуры
@@ -205,13 +232,13 @@ namespace foxhole_artillery_calculator
                 case KeyboardHook.VKeys.SUBTRACT:
                     count = 0;
                     enemyAzimuth = 0;
-                    if (currentStatus == Status.enemyDistance)
+                    if (CurrentStatus == Status.enemyDistance)
                     {
-                        currentStatus = Status.enemyAzimuth;
+                        CurrentStatus = Status.enemyAzimuth;
                     }
                     else
                     {
-                        currentStatus = Status.enemyDistance;
+                        CurrentStatus = Status.enemyDistance;
                         enemyDistance = 0;
                     }
                     UpdateInterface();
@@ -220,13 +247,13 @@ namespace foxhole_artillery_calculator
                 case KeyboardHook.VKeys.ADD:
                     count = 0;
                     friendlyAzimuth = 0;
-                    if (currentStatus == Status.friendlyDistance)
+                    if (CurrentStatus == Status.friendlyDistance)
                     {
-                        currentStatus = Status.friendlyAzimuth;
+                        CurrentStatus = Status.friendlyAzimuth;
                     }
                     else
                     {
-                        currentStatus = Status.friendlyDistance;
+                        CurrentStatus = Status.friendlyDistance;
                         friendlyDistance = 0;
                     }
                     UpdateInterface();
@@ -244,7 +271,7 @@ namespace foxhole_artillery_calculator
                     Button_Turn(null, null);
                     return;
                 default:
-                    if (currentStatus == Status.none)
+                    if (CurrentStatus == Status.none)
                         return;
                     break;
             }
@@ -256,16 +283,16 @@ namespace foxhole_artillery_calculator
             if (value.Length != 7 || !regex.IsMatch(value.Substring(6, 1)))
             {
                 count = 0;
-                switch (currentStatus)
+                switch (CurrentStatus)
                 {
                     case Status.enemyDistance:
-                        currentStatus = Status.enemyAzimuth;
+                        CurrentStatus = Status.enemyAzimuth;
                         break;
                     case Status.friendlyDistance:
-                        currentStatus = Status.friendlyAzimuth;
+                        CurrentStatus = Status.friendlyAzimuth;
                         break;
                     default:
-                        currentStatus = Status.none;
+                        CurrentStatus = Status.none;
                         break;
                 }
                 UpdateInterface();
@@ -285,7 +312,7 @@ namespace foxhole_artillery_calculator
         void AddDigit(int digit)
         {
             count++;
-            switch (currentStatus)
+            switch (CurrentStatus)
             {
                 case Status.enemyDistance:
                     enemyDistance *= 10;
@@ -296,7 +323,7 @@ namespace foxhole_artillery_calculator
                     if (count == 3 || (count == 2 && enemyDistance > 9 && Math.Truncate((double)enemyDistance/10) > 1))
                     {
                         count = 0;
-                        currentStatus = Status.enemyAzimuth;
+                        CurrentStatus = Status.enemyAzimuth;
                     }
                     break;
                 case Status.enemyAzimuth:
@@ -308,7 +335,7 @@ namespace foxhole_artillery_calculator
                     if (count == 3 || (count == 2 && enemyAzimuth > 9 && Math.Truncate((double)enemyAzimuth / 10) > 3))
                     {
                         count = 0;
-                        currentStatus = Status.none;
+                        CurrentStatus = Status.none;
                     }
                     break;
                 case Status.friendlyDistance:
@@ -320,7 +347,7 @@ namespace foxhole_artillery_calculator
                     if (count == 3 || (count == 2 && friendlyDistance > 9 && Math.Truncate((double)friendlyDistance / 10) > 1))
                     {
                         count = 0;
-                        currentStatus = Status.friendlyAzimuth;
+                        CurrentStatus = Status.friendlyAzimuth;
                     }
                     break;
                 case Status.friendlyAzimuth:
@@ -332,7 +359,7 @@ namespace foxhole_artillery_calculator
                     if (count == 3 || (count == 2 && friendlyAzimuth > 9 && Math.Truncate((double)friendlyAzimuth / 10) > 3))
                     {
                         count = 0;
-                        currentStatus = Status.none;
+                        CurrentStatus = Status.none;
                     }
                     break;
                 default:

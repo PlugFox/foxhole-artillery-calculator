@@ -54,12 +54,12 @@
                     <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Vertical">
                         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" ToolTip="Дистанция от наводчика до врага.">
                             <Label Content="Дист. " Foreground="Red" Margin="0"  FontSize="16"/>
-                            <Label x:Name="enemyDistanceLBL" Foreground="Red" HorizontalAlignment="Stretch" Margin="10,0" Width="40px" FontSize="16" Background="Transparent" BorderBrush="Transparent" />
+                            <Label x:Name="enemyDistanceLBL" Foreground="Red" HorizontalAlignment="Stretch" Margin="5,0" Width="50px" FontSize="16" Background="Transparent" BorderBrush="Transparent" />
                             <Label Content="м" Foreground="Red" Margin="0"  FontSize="16"/>
                         </StackPanel>
                         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" ToolTip="Азимут от наводчика до врага.">
                             <Label Content="Азим." Foreground="Red" Margin="0"  FontSize="16"/>
-                            <Label x:Name="enemyAzimuthLBL" Foreground="Red" HorizontalAlignment="Stretch" Margin="10,0" Width="40px" FontSize="16" Background="Transparent" BorderBrush="Transparent" />
+                            <Label x:Name="enemyAzimuthLBL" Foreground="Red" HorizontalAlignment="Stretch" Margin="5,0" Width="50px" FontSize="16" Background="Transparent" BorderBrush="Transparent" />
                             <Label Content="°" Foreground="Red" Margin="0"  FontSize="16"/>
                         </StackPanel>
                     </StackPanel>
@@ -68,12 +68,12 @@
                     <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Vertical">
                         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" ToolTip="Дистанция от наводчика до союзника.">
                             <Label Content="Дист. " Foreground="Red" Margin="0"  FontSize="16"/>
-                            <Label x:Name="friendlyDistanceLBL" Foreground="Red" HorizontalAlignment="Stretch" Margin="10,0" Width="40px" FontSize="16" Background="Transparent" BorderBrush="Transparent" />
+                            <Label x:Name="friendlyDistanceLBL" Foreground="Red" HorizontalAlignment="Stretch" Margin="5,0" Width="50px" FontSize="16" Background="Transparent" BorderBrush="Transparent" />
                             <Label Content="м" Foreground="Red" Margin="0"  FontSize="16"/>
                         </StackPanel>
                         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" ToolTip="Азимут от наводчика до союзника.">
                             <Label Content="Азим." Foreground="Red" Margin="0"  FontSize="16"/>
-                            <Label x:Name="friendlyAzimuthLBL" Foreground="Red" HorizontalAlignment="Stretch" Margin="10,0" Width="40px" FontSize="16" Background="Transparent" BorderBrush="Transparent" />
+                            <Label x:Name="friendlyAzimuthLBL" Foreground="Red" HorizontalAlignment="Stretch" Margin="5,0" Width="50px" FontSize="16" Background="Transparent" BorderBrush="Transparent" />
                             <Label Content="°" Foreground="Red" Margin="0"  FontSize="16"/>
                         </StackPanel>
                     </StackPanel>
@@ -82,12 +82,12 @@
                     <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Vertical">
                         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" ToolTip="Дистанция от союзника до союзника.">
                             <Label Content="Дист. " Foreground="Red" Margin="0"  FontSize="16" BorderBrush="Black" Background="{x:Null}"/>
-                            <Label x:Name="targetDistanceLBL" Foreground="Red" HorizontalAlignment="Stretch" Margin="10,0" Width="40px" FontSize="16" Background="Transparent" BorderBrush="Transparent" />
+                            <Label x:Name="targetDistanceLBL" Foreground="Red" HorizontalAlignment="Stretch" Margin="5,0" Width="50px" FontSize="16" Background="Transparent" BorderBrush="Transparent" />
                             <Label Content="м" Foreground="Red" Margin="0"  FontSize="16"/>
                         </StackPanel>
                         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" ToolTip="Азимут от союзника до союзника.">
                             <Label Content="Азим." Foreground="Red" Margin="0"  FontSize="16"/>
-                            <Label x:Name="targetAzimuthLBL" Foreground="Red" HorizontalAlignment="Stretch" Margin="10,0" Width="40px" FontSize="16" Background="Transparent" BorderBrush="Transparent" />
+                            <Label x:Name="targetAzimuthLBL" Foreground="Red" HorizontalAlignment="Stretch" Margin="5,0" Width="50px" FontSize="16" Background="Transparent" BorderBrush="Transparent" />
                             <Label Content="°" Foreground="Red" Margin="0"  FontSize="16"/>
                         </StackPanel>
                     </StackPanel>
