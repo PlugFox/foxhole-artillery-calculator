@@ -26,7 +26,17 @@
     </x:Code>
     <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Orientation="Vertical">
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" Margin="0 0 0 2">
-            <Image Height="20px" Width="170px" Source="img/Header.png" Stretch="Fill" />
+            <Image Height="20px" Width="130px" Source="img/Header.png" Stretch="Fill" />
+            <Button Height="20px" Width="20px" Margin="2 0 0 0" BorderThickness="0" HorizontalAlignment="Center" VerticalAlignment="Center" Cursor="Cross" ToolTip="ТАБЛИЦЫ" Tag="СВЕРНУТЬ / РАЗВЕРНУТЬ" Click="Button_Data" >
+                <Button.Background>
+                    <ImageBrush ImageSource="img/Data.png"/>
+                </Button.Background>
+            </Button>
+            <Button Height="20px" Width="20px" Margin="2 0 0 0" BorderThickness="0" HorizontalAlignment="Center" VerticalAlignment="Center" Cursor="Cross" ToolTip="ИНФОРМАЦИЯ О ПРОГРАММЕ" Tag="СВЕРНУТЬ / РАЗВЕРНУТЬ" Click="Button_Info" >
+                <Button.Background>
+                    <ImageBrush ImageSource="img/Info.png"/>
+                </Button.Background>
+            </Button>
             <Button Height="20px" Width="20px" Margin="2 0 0 0" BorderThickness="0" HorizontalAlignment="Center" VerticalAlignment="Center" Cursor="Cross" ToolTip="СВЕРНУТЬ / РАЗВЕРНУТЬ" Tag="СВЕРНУТЬ / РАЗВЕРНУТЬ" Click="Button_Turn" >
                 <Button.Background>
                     <ImageBrush ImageSource="img/Turn.png"/>
@@ -40,7 +50,7 @@
         </StackPanel>
         <StackPanel x:Name="body" HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Left" Orientation="Vertical" Width="150px">
-                <GroupBox Header="Враги (Num -)" Foreground="White" x:Name="enemyGroup" Background="Transparent" FontSize="12" Margin="0 0 0 2">
+                <GroupBox Header="Враг (Num -)" Foreground="White" x:Name="enemyGroup" Background="Transparent" FontSize="12" Margin="0 0 0 2">
                     <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Vertical">
                         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" ToolTip="Дистанция от наводчика до врага.">
                             <Label Content="Дист. " Foreground="Red" Margin="0"  FontSize="16"/>
@@ -54,7 +64,7 @@
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
-                <GroupBox Header="Союзники (Num +)" Foreground="White" x:Name="friendlyGroup" Background="Transparent" FontSize="12" Margin="0 0 0 2">
+                <GroupBox Header="Союзник (Num +)" Foreground="White" x:Name="friendlyGroup" Background="Transparent" FontSize="12" Margin="0 0 0 2">
                     <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Vertical">
                         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" ToolTip="Дистанция от наводчика до союзника.">
                             <Label Content="Дист. " Foreground="Red" Margin="0"  FontSize="16"/>
@@ -68,7 +78,7 @@
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
-                <GroupBox Header="Союзники 🎯 враги" Foreground="White" x:Name="targetGroup" Background="Transparent" FontSize="12" Margin="0 0 0 2">
+                <GroupBox Header="Союзник 🎯 враг" Foreground="White" x:Name="targetGroup" Background="Transparent" FontSize="12" Margin="0 0 0 2" MouseDown="Sound_MouseDown">
                     <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Vertical">
                         <StackPanel HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal" ToolTip="Дистанция от союзника до союзника.">
                             <Label Content="Дист. " Foreground="Red" Margin="0"  FontSize="16" BorderBrush="Black" Background="{x:Null}"/>
@@ -82,14 +92,15 @@
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
+                
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" Margin="0 0 0 2">
                     <Image Width="30px" Height="30px" Source="img/Mortar.png" Cursor="Help" ToolTip="Дистанция: 45-65 м." ToolTipService.InitialShowDelay="500"/>
                     <Image Width="30px" Height="30px" Source="img/Field_Artillery.png" Cursor="Help" ToolTip="Дистанция: 75-150 м." ToolTipService.InitialShowDelay="500"/>
-                    <Image Width="30px" Height="30px" Source="img/Howitzer.png" Cursor="Help" ToolTip="Дистанция: 75-150 м." ToolTipService.InitialShowDelay="500"/>
+                    <Image Width="30px" Height="30px" Source="img/Howitzer.png" Cursor="Help" ToolTip="Дистанция: 75-150 м. Разброс: ~25м" ToolTipService.InitialShowDelay="500"/>
                     <Image Width="30px" Height="30px" Source="img/Gunship.png" Cursor="Help" ToolTip="Дистанция: 50-100 м." ToolTipService.InitialShowDelay="500"/>
                 </StackPanel>
                 
-                <Image Width="100px" Height="50px" x:Name="Screenshot" Margin="0,10,0,10"/>
+                <Image Width="100px" Height="50px" x:Name="Screenshot" Margin="0,10,0,10" MouseDown="Screenshot_MouseDown" />
             </StackPanel>
 
             <StackPanel HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Orientation="Vertical" Width="45px" Margin="5,0,0,0">
@@ -106,7 +117,6 @@
                     <Label MouseDown="Label_MouseDown" Foreground="White"/>
                 </Border>
             </StackPanel>
-        </StackPanel>
-        
+        </StackPanel>        
     </StackPanel>
 </Window>
