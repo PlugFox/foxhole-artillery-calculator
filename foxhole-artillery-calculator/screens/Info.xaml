@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="Информация о программе" Height="850" Width="700" FontSize="16" Background="Black" Foreground="LightGray" 
         WindowStyle="ToolWindow" SizeToContent="Height" MouseLeftButtonDown="WindowMouseLeftButtonDown"
-        ResizeMode="NoResize">
+        ResizeMode="NoResize" Topmost="True">
     <x:Code>
         <![CDATA[            
                 private void WindowMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

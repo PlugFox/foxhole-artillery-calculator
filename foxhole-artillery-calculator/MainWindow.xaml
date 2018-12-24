@@ -8,7 +8,7 @@
         Title="Калькулятор артиллериста" Height="400" Width="220" Visibility="Visible" WindowStyle="None" 
         ScrollViewer.VerticalScrollBarVisibility="Disabled" VerticalContentAlignment="Center" 
         HorizontalContentAlignment="Center" AllowsTransparency="True" Background="Transparent"
-        MouseLeftButtonDown="WindowMouseLeftButtonDown" FontSize="16" SizeToContent="Height" Topmost="True" FontWeight="Bold">
+        MouseLeftButtonDown="WindowMouseLeftButtonDown" FontSize="16" SizeToContent="Height" Topmost="True" FontWeight="Bold" ResizeMode="NoResize">
     <x:Code>
         <![CDATA[            
             private void WindowMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
