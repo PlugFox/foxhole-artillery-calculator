@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:foxhole_artillery_calculator.screens"
         mc:Ignorable="d"
-        Title="Информация о программе" Height="850" Width="700" FontSize="16" Background="Black" Foreground="LightGray" 
+        Title="Информация о программе" Height="900" Width="700" FontSize="16" Background="Black" Foreground="LightGray" 
         WindowStyle="ToolWindow" SizeToContent="Height" MouseLeftButtonDown="WindowMouseLeftButtonDown"
         ResizeMode="NoResize" Topmost="True">
     <x:Code>
@@ -81,6 +81,15 @@
                         <TextBlock Text="plugfox@gmail.com"/>
                     </StackPanel>                    
                 </StackPanel>
+                <LineBreak/>
+                <LineBreak/>
+                <Run Text="Благодарности:" FontSize="20" FontWeight="Bold" Foreground="OrangeRed"/>
+                <LineBreak/>
+                <Run Text=" Дед Ос-Багатар"/>
+                <LineBreak/>
+                <Run Text=" [404th] Silver Fox"/>
+                <LineBreak/>
+                <Run Text=" "/>
             </TextBlock>
         </StackPanel>
     </Border>

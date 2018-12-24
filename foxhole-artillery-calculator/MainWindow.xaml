@@ -93,11 +93,19 @@
                     </StackPanel>
                 </GroupBox>
                 
-                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" Margin="0 0 0 2">
-                    <Image Width="30px" Height="30px" Source="img/Mortar.png" Cursor="Help" ToolTip="Дистанция: 45-65 м." ToolTipService.InitialShowDelay="500"/>
-                    <Image Width="30px" Height="30px" Source="img/Field_Artillery.png" Cursor="Help" ToolTip="Дистанция: 75-150 м." ToolTipService.InitialShowDelay="500"/>
-                    <Image Width="30px" Height="30px" Source="img/Howitzer.png" Cursor="Help" ToolTip="Дистанция: 75-150 м. Разброс: ~25м" ToolTipService.InitialShowDelay="500"/>
-                    <Image Width="30px" Height="30px" Source="img/Gunship.png" Cursor="Help" ToolTip="Дистанция: 50-100 м." ToolTipService.InitialShowDelay="500"/>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal" Margin="0 2 0 2">
+                    <Border x:Name="Mortar" CornerRadius="5" Padding="0" Background="#7F00FF00" BorderThickness="2" BorderBrush="White">
+                        <Image Width="30px" Height="30px" Source="img/Mortar.png" Cursor="Help" ToolTip="Дистанция: 45-65 м." ToolTipService.InitialShowDelay="500"/>
+                    </Border>
+                    <Border x:Name="FieldArtillery" CornerRadius="5" Padding="0" Background="#7F00FF00" BorderThickness="2" BorderBrush="White" Margin="3 0 0 0">
+                        <Image Width="30px" Height="30px" Source="img/Field_Artillery.png" Cursor="Help" ToolTip="Дистанция: 75-150 м." ToolTipService.InitialShowDelay="500"/>
+                    </Border>
+                    <Border x:Name="Howitzer" CornerRadius="5" Padding="0" Background="#7F00FF00" BorderThickness="2" BorderBrush="White" Margin="3 0 0 0">
+                        <Image Width="30px" Height="30px" Source="img/Howitzer.png" Cursor="Help" ToolTip="Дистанция: 75-150 м. Разброс: ~15м" ToolTipService.InitialShowDelay="500"/>
+                    </Border>
+                    <Border x:Name="Gunship" CornerRadius="5" Padding="0" Background="#7F00FF00" BorderThickness="2" BorderBrush="White" Margin="3 0 0 0">
+                        <Image Width="30px" Height="30px" Source="img/Gunship.png" Cursor="Help" ToolTip="Дистанция: 50-100 м." ToolTipService.InitialShowDelay="500"/>
+                    </Border>
                 </StackPanel>
                 
                 <Image Width="100px" Height="50px" x:Name="Screenshot" Margin="0,10,0,10" MouseDown="Screenshot_MouseDown" />

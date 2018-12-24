@@ -124,6 +124,46 @@ namespace foxhole_artillery_calculator
                     default:
                         break;
                 }
+
+                // Подкрашу иконки в зависимости от выставленной дальности
+                System.Windows.Media.Color colorGreen = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#7F00FF00");
+                System.Windows.Media.Color colorRed = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#7FFF0000");
+                // Мортира
+                if (44 < targetDistance && targetDistance < 66)
+                {
+                    Mortar.Background = new SolidColorBrush(colorGreen);
+                } else
+                {
+                    Mortar.Background = new SolidColorBrush(colorRed);
+                }
+                // Артилерия
+                if (74 < targetDistance && targetDistance < 151)
+                {
+                    FieldArtillery.Background = new SolidColorBrush(colorGreen);
+                }
+                else
+                {
+                    FieldArtillery.Background = new SolidColorBrush(colorRed);
+                }
+                // Хова с учетом разброса
+                if (59 < targetDistance && targetDistance < 166)
+                {
+                    Howitzer.Background = new SolidColorBrush(colorGreen);
+                }
+                else
+                {
+                    Howitzer.Background = new SolidColorBrush(colorRed);
+                }
+                // Ганбоат
+                if (49 < targetDistance && targetDistance < 101)
+                {
+                    Gunship.Background = new SolidColorBrush(colorGreen);
+                }
+                else
+                {
+                    Gunship.Background = new SolidColorBrush(colorRed);
+                }
+
             });
             return;
         }
@@ -217,7 +257,7 @@ namespace foxhole_artillery_calculator
         }
         double DegToRad(int deg) => (Math.PI * deg) / 180;
         double RadToDeg(double rad) => (rad * 180) / Math.PI;
-        double ConvertAngle(double deg) => ((deg > 360) ? deg - 360 : deg);
+        double ConvertAngle(double deg) => ((deg >= 360) ? deg - 360 : deg);
         #endregion
 
         #region Чтение клавиатуры
