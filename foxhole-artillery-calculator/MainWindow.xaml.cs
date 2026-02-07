@@ -36,7 +36,10 @@ namespace foxhole_artillery_calculator
             get => _CurrentStatus;
             set
             {
-                //Task.Run(() => Console.Beep(300, 200));
+                if (config.General.BeepOnFieldChange)
+                {
+                    Task.Run(() => Console.Beep(300, 200));
+                }
                 _CurrentStatus = value;
             }
         }
@@ -68,11 +71,42 @@ namespace foxhole_artillery_calculator
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool SetForegroundWindow(IntPtr hWnd);
+        // Конфигурация
+        private AppConfiguration config;
+        // Хоткеи из конфигурации
+        private KeyboardHook.VKeys enemyCoordinatesHotkey;
+        private KeyboardHook.VKeys friendlyCoordinatesHotkey;
+        private KeyboardHook.VKeys screenshotHotkey;
+        private KeyboardHook.VKeys changeResolutionHotkey;
+        private KeyboardHook.VKeys toggleWindowHotkey;
         #endregion
 
         // Вход
         public MainWindow()
         {
+            // Загрузим конфигурацию
+            config = ConfigurationManager.Instance;
+            
+            // Загрузим хоткеи из конфигурации
+            try
+            {
+                enemyCoordinatesHotkey = ConfigurationManager.ParseHotkey(config.Hotkeys.EnemyCoordinates);
+                friendlyCoordinatesHotkey = ConfigurationManager.ParseHotkey(config.Hotkeys.FriendlyCoordinates);
+                screenshotHotkey = ConfigurationManager.ParseHotkey(config.Hotkeys.Screenshot);
+                changeResolutionHotkey = ConfigurationManager.ParseHotkey(config.Hotkeys.ChangeResolution);
+                toggleWindowHotkey = ConfigurationManager.ParseHotkey(config.Hotkeys.ToggleWindow);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки хоткеев из конфигурации: {ex.Message}\n\nИспользуются значения по умолчанию.", "Ошибка конфигурации", MessageBoxButton.OK, MessageBoxImage.Warning);
+                // Fallback to defaults
+                enemyCoordinatesHotkey = KeyboardHook.VKeys.SUBTRACT;
+                friendlyCoordinatesHotkey = KeyboardHook.VKeys.ADD;
+                screenshotHotkey = KeyboardHook.VKeys.SNAPSHOT;
+                changeResolutionHotkey = KeyboardHook.VKeys.MULTIPLY;
+                toggleWindowHotkey = KeyboardHook.VKeys.DECIMAL;
+            }
+
             // Отлавливаем события клавиатурным хуком
             keyboardHook.KeyDown += new KeyboardHook.KeyboardHookCallback(KeyboardHook_KeyDown);
             // Установим клавиатурный хук
@@ -103,6 +137,16 @@ namespace foxhole_artillery_calculator
                 targetAzimuthLBL.Content = targetAzimuth;
 
                 // Установлю цвет полей в зависимости от текущего статуса
+                System.Windows.Media.Color activeColor;
+                try
+                {
+                    activeColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(config.UI.ActiveFieldColor);
+                }
+                catch
+                {
+                    activeColor = Colors.Lime;
+                }
+                
                 enemyDistanceLBL.Background = new SolidColorBrush(Colors.Transparent);
                 enemyAzimuthLBL.Background = new SolidColorBrush(Colors.Transparent);
                 friendlyDistanceLBL.Background = new SolidColorBrush(Colors.Transparent);
@@ -110,26 +154,37 @@ namespace foxhole_artillery_calculator
                 switch (CurrentStatus)
                 {
                     case Status.enemyDistance:
-                        enemyDistanceLBL.Background = new SolidColorBrush(Colors.Lime);
+                        enemyDistanceLBL.Background = new SolidColorBrush(activeColor);
                         break;
                     case Status.enemyAzimuth:
-                        enemyAzimuthLBL.Background = new SolidColorBrush(Colors.Lime);
+                        enemyAzimuthLBL.Background = new SolidColorBrush(activeColor);
                         break;
                     case Status.friendlyDistance:
-                        friendlyDistanceLBL.Background = new SolidColorBrush(Colors.Lime);
+                        friendlyDistanceLBL.Background = new SolidColorBrush(activeColor);
                         break;
                     case Status.friendlyAzimuth:
-                        friendlyAzimuthLBL.Background = new SolidColorBrush(Colors.Lime);
+                        friendlyAzimuthLBL.Background = new SolidColorBrush(activeColor);
                         break;
                     default:
                         break;
                 }
 
                 // Подкрашу иконки в зависимости от выставленной дальности
-                System.Windows.Media.Color colorGreen = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#7F00FF00");
-                System.Windows.Media.Color colorRed = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#7FFF0000");
+                System.Windows.Media.Color colorGreen;
+                System.Windows.Media.Color colorRed;
+                try
+                {
+                    colorGreen = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(config.UI.InRangeColor);
+                    colorRed = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(config.UI.OutOfRangeColor);
+                }
+                catch
+                {
+                    colorGreen = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#7F00FF00");
+                    colorRed = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#7FFF0000");
+                }
+                
                 // Мортира
-                if (44 < targetDistance && targetDistance < 66)
+                if (config.Artillery.Mortar.MinRange < targetDistance && targetDistance < config.Artillery.Mortar.MaxRange)
                 {
                     Mortar.Background = new SolidColorBrush(colorGreen);
                 } else
@@ -137,7 +192,7 @@ namespace foxhole_artillery_calculator
                     Mortar.Background = new SolidColorBrush(colorRed);
                 }
                 // Артилерия
-                if (74 < targetDistance && targetDistance < 151)
+                if (config.Artillery.FieldArtillery.MinRange < targetDistance && targetDistance < config.Artillery.FieldArtillery.MaxRange)
                 {
                     FieldArtillery.Background = new SolidColorBrush(colorGreen);
                 }
@@ -146,7 +201,7 @@ namespace foxhole_artillery_calculator
                     FieldArtillery.Background = new SolidColorBrush(colorRed);
                 }
                 // Хова с учетом разброса
-                if (59 < targetDistance && targetDistance < 166)
+                if (config.Artillery.Howitzer.MinRange < targetDistance && targetDistance < config.Artillery.Howitzer.MaxRange)
                 {
                     Howitzer.Background = new SolidColorBrush(colorGreen);
                 }
@@ -155,7 +210,7 @@ namespace foxhole_artillery_calculator
                     Howitzer.Background = new SolidColorBrush(colorRed);
                 }
                 // Ганбоат
-                if (49 < targetDistance && targetDistance < 101)
+                if (config.Artillery.Gunship.MinRange < targetDistance && targetDistance < config.Artillery.Gunship.MaxRange)
                 {
                     Gunship.Background = new SolidColorBrush(colorGreen);
                 }
@@ -266,59 +321,70 @@ namespace foxhole_artillery_calculator
         private async void KeyPressedAsync(KeyboardHook.VKeys VKey) => await Task.Run(() => KeyPressed(VKey));
         private void KeyPressed(KeyboardHook.VKeys VKey)
         {            
-            switch (VKey)
+            // Если нажали на хоткей врага
+            if (VKey == enemyCoordinatesHotkey)
             {
-                // Если нажали на минус и хотим установить позицию врага
-                case KeyboardHook.VKeys.SUBTRACT:
-                    count = 0;
-                    enemyAzimuth = 0;
-                    if (CurrentStatus == Status.enemyDistance)
-                    {
-                        CurrentStatus = Status.enemyAzimuth;
-                    }
-                    else
-                    {
-                        CurrentStatus = Status.enemyDistance;
-                        enemyDistance = 0;
-                    }
-                    UpdateInterface();
-                    return;
-                // Если нажали на плюс и хотим установить позицию союзника
-                case KeyboardHook.VKeys.ADD:
-                    count = 0;
-                    friendlyAzimuth = 0;
-                    if (CurrentStatus == Status.friendlyDistance)
-                    {
-                        CurrentStatus = Status.friendlyAzimuth;
-                    }
-                    else
-                    {
-                        CurrentStatus = Status.friendlyDistance;
-                        friendlyDistance = 0;
-                    }
-                    UpdateInterface();
-                    return;
-                // Если нажали на принтскрин и заскринили текущие координаты
-                case KeyboardHook.VKeys.SNAPSHOT:
-                    CaptureScreen();
-                    return;
-                // Если нажали на умножение - меняем разрешение окна фоксхола на квадратное
-                case KeyboardHook.VKeys.MULTIPLY:
-                    ChangeResolution();
-                    return;
-                // Если нажали на точку - свернуть/развернуть окно
-                case KeyboardHook.VKeys.DECIMAL:
-                    Button_Turn(null, null);
-                    return;
-                default:
-                    if (CurrentStatus == Status.none)
-                        return;
-                    break;
+                count = 0;
+                enemyAzimuth = 0;
+                if (CurrentStatus == Status.enemyDistance)
+                {
+                    CurrentStatus = Status.enemyAzimuth;
+                }
+                else
+                {
+                    CurrentStatus = Status.enemyDistance;
+                    enemyDistance = 0;
+                }
+                UpdateInterface();
+                return;
             }
+            
+            // Если нажали на хоткей союзника
+            if (VKey == friendlyCoordinatesHotkey)
+            {
+                count = 0;
+                friendlyAzimuth = 0;
+                if (CurrentStatus == Status.friendlyDistance)
+                {
+                    CurrentStatus = Status.friendlyAzimuth;
+                }
+                else
+                {
+                    CurrentStatus = Status.friendlyDistance;
+                    friendlyDistance = 0;
+                }
+                UpdateInterface();
+                return;
+            }
+            
+            // Если нажали на хоткей скриншота
+            if (VKey == screenshotHotkey)
+            {
+                CaptureScreen();
+                return;
+            }
+            
+            // Если нажали на хоткей смены разрешения
+            if (VKey == changeResolutionHotkey)
+            {
+                ChangeResolution();
+                return;
+            }
+            
+            // Если нажали на хоткей сворачивания окна
+            if (VKey == toggleWindowHotkey)
+            {
+                Button_Turn(null, null);
+                return;
+            }
+            
+            // Если текущий статус не активен, выходим
+            if (CurrentStatus == Status.none)
+                return;
 
             string value = VKey.ToString().ToLower();
 
-            // Если нажали не на Num -, Num +, PrtScr и не на Num 0-9 
+            // Если нажали не на Num 0-9 
             // или текущий ввод не активен - прерываем любые вводы и завершаем процедуру
             if (value.Length != 7 || !regex.IsMatch(value.Substring(6, 1)))
             {
@@ -413,8 +479,8 @@ namespace foxhole_artillery_calculator
         {
             Task.Run(() =>
             {
-                int w = 100;
-                int h = 50;
+                int w = config.General.ScreenshotWidth;
+                int h = config.General.ScreenshotHeight;
                 var pos = System.Windows.Forms.Cursor.Position;
                 Bitmap result = new Bitmap(w, h);
 
@@ -495,7 +561,7 @@ namespace foxhole_artillery_calculator
         #region Синтез речи
         void Say(int sayDistance, int sayAzimuth = 0)
         {
-            if (sayDistance == 0)
+            if (sayDistance == 0 || !config.UI.EnableSound)
                 return;
             Task.Run(() =>
             {
@@ -506,7 +572,15 @@ namespace foxhole_artillery_calculator
                         // Configure the synthesizer to send output to the default audio device.  
                         synth.SetOutputToDefaultAudioDevice();
 
-                        synth.SelectVoiceByHints(VoiceGender.Neutral, VoiceAge.NotSet, 0, CultureInfo.GetCultureInfo("en-US"));
+                        try
+                        {
+                            synth.SelectVoiceByHints(VoiceGender.Neutral, VoiceAge.NotSet, 0, CultureInfo.GetCultureInfo(config.UI.VoiceCulture));
+                        }
+                        catch
+                        {
+                            // Fallback to en-US if configured culture is not available
+                            synth.SelectVoiceByHints(VoiceGender.Neutral, VoiceAge.NotSet, 0, CultureInfo.GetCultureInfo("en-US"));
+                        }
 
                         // Speak a phrase.  
                         synth.Speak(String.Format("Distance: {0}, azimuth: {1}", sayDistance, sayAzimuth));
