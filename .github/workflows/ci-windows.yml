@@ -1,0 +1,96 @@
+name: CI - Windows Build
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Verification (Windows)
+    runs-on: windows-latest
+    
+    strategy:
+      matrix:
+        configuration: [Debug, Release]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+      
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v2
+      
+      - name: Restore NuGet packages
+        run: nuget restore foxhole-artillery-calculator/foxhole-artillery-calculator.sln
+      
+      - name: Build solution (${{ matrix.configuration }})
+        run: |
+          msbuild foxhole-artillery-calculator/foxhole-artillery-calculator.sln `
+            /p:Configuration=${{ matrix.configuration }} `
+            /p:Platform="Any CPU" `
+            /p:OutputPath=bin\${{ matrix.configuration }} `
+            /v:minimal
+      
+      - name: Verify build output
+        shell: pwsh
+        run: |
+          $config = "${{ matrix.configuration }}"
+          $binPath = "foxhole-artillery-calculator/bin/$config"
+          
+          Write-Host "Checking build output in $binPath..."
+          
+          if (-not (Test-Path $binPath)) {
+            Write-Error "Build output directory not found: $binPath"
+            exit 1
+          }
+          
+          # Check for executable
+          $exeFiles = Get-ChildItem -Path $binPath -Filter "*.exe" -File
+          if ($exeFiles.Count -eq 0) {
+            Write-Error "No executable found in $binPath"
+            exit 1
+          }
+          
+          Write-Host "✅ Found executable: $($exeFiles[0].Name)"
+          
+          # Check for DLLs
+          $dllFiles = Get-ChildItem -Path $binPath -Filter "*.dll" -File
+          Write-Host "✅ Found $($dllFiles.Count) DLL files"
+          
+          # Check for YamlDotNet dependency
+          $yamlDll = Get-ChildItem -Path $binPath -Filter "YamlDotNet.dll" -File
+          if ($yamlDll) {
+            Write-Host "✅ YamlDotNet.dll found"
+          } else {
+            Write-Warning "⚠️ YamlDotNet.dll not found - configuration system may not work"
+          }
+          
+          # List all output files
+          Write-Host ""
+          Write-Host "Build output files:"
+          Get-ChildItem -Path $binPath -File | ForEach-Object {
+            Write-Host "  - $($_.Name) ($([math]::Round($_.Length/1KB, 2)) KB)"
+          }
+      
+      - name: Upload build artifacts
+        if: matrix.configuration == 'Release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build-${{ matrix.configuration }}
+          path: foxhole-artillery-calculator/bin/${{ matrix.configuration }}/
+          retention-days: 7
+      
+      - name: Summary
+        if: always()
+        shell: pwsh
+        run: |
+          Write-Host ""
+          Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          Write-Host "✅ Windows ${{ matrix.configuration }} build completed!"
+          Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

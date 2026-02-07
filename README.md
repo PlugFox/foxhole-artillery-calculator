@@ -137,3 +137,37 @@ To create a new release using GitHub Actions:
    - Update version in `AssemblyInfo.cs`
    - Build Windows executable
    - Create GitHub release with the executable file
+
+---
+
+## CI/CD / Непрерывная интеграция
+
+Репозиторий использует автоматические проверки кода при каждом Pull Request и коммите в main:
+
+### Linux Code Checks (быстрая проверка)
+- Проверка синтаксиса YAML файлов
+- Валидация структуры файлов проекта
+- Проверка базового синтаксиса C#
+- Проверка конфигурации NuGet пакетов
+- Проверка документации
+
+### Windows Build Verification (проверка компиляции)
+- Сборка Debug и Release конфигураций
+- Проверка NuGet зависимостей
+- Проверка выходных файлов (exe, dll)
+- Артефакты сборки доступны в Actions
+
+The repository uses automated code checks for every Pull Request and commit to main:
+
+### Linux Code Checks (fast validation)
+- YAML syntax validation
+- Project file structure verification
+- Basic C# syntax checking
+- NuGet packages configuration check
+- Documentation validation
+
+### Windows Build Verification (compilation check)
+- Build Debug and Release configurations
+- Verify NuGet dependencies
+- Check build output files (exe, dll)
+- Build artifacts available in Actions
