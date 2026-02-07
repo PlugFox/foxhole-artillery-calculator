@@ -110,6 +110,9 @@ jobs:
         run: |
           echo "Checking NuGet packages.config..."
 
+          # Install xmllint
+          sudo apt-get install -y libxml2-utils
+
           if [ -f "foxhole-artillery-calculator/packages.config" ]; then
             # Validate XML structure
             if xmllint --noout foxhole-artillery-calculator/packages.config 2>/dev/null; then
