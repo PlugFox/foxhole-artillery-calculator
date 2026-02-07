@@ -33,3 +33,31 @@ PrtScr
 + Если на данный момент кальк не нужен - можно "свернуть" в полосочку по стрелочкам в шапочке, чтоб не мешался.  
 + Подсветка возможности ведения ответного огня  
 + В шапке есть кнопка для открытия дополнительной полезной информации.
+
+---
+
+## Создание релиза / Creating a Release
+
+Для создания нового релиза используйте GitHub Actions:
+
+1. Перейдите во вкладку **Actions** в репозитории
+2. Выберите workflow **"Create Release"**
+3. Нажмите **"Run workflow"**
+4. Введите версию в формате `X.Y.Z` (например, `1.0.0`)
+5. Workflow автоматически:
+   - Создаст git тэг `vX.Y.Z`
+   - Обновит версию в `AssemblyInfo.cs`
+   - Соберёт Windows executable
+   - Создаст GitHub release с исполняемым файлом
+
+To create a new release using GitHub Actions:
+
+1. Go to the **Actions** tab in the repository
+2. Select the **"Create Release"** workflow
+3. Click **"Run workflow"**
+4. Enter version in format `X.Y.Z` (e.g., `1.0.0`)
+5. The workflow will automatically:
+   - Create git tag `vX.Y.Z`
+   - Update version in `AssemblyInfo.cs`
+   - Build Windows executable
+   - Create GitHub release with the executable file

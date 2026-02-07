@@ -1,0 +1,141 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number (e.g., 1.0.0)'
+        required: true
+        type: string
+
+jobs:
+  create-release:
+    name: Create Release and Build Windows Executable
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Validate version format
+        shell: pwsh
+        run: |
+          $version = "${{ github.event.inputs.version }}"
+          if ($version -notmatch '^\d+\.\d+\.\d+$') {
+            Write-Error "Version must be in format X.Y.Z (e.g., 1.0.0)"
+            exit 1
+          }
+          Write-Host "Version $version is valid"
+      
+      - name: Check if tag exists
+        shell: pwsh
+        run: |
+          $version = "${{ github.event.inputs.version }}"
+          $tag = "v$version"
+          git fetch --tags
+          if (git tag -l $tag) {
+            Write-Error "Tag $tag already exists"
+            exit 1
+          }
+          Write-Host "Tag $tag does not exist, proceeding..."
+      
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+      
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v2
+      
+      - name: Restore NuGet packages
+        run: nuget restore foxhole-artillery-calculator/foxhole-artillery-calculator.sln
+      
+      - name: Update AssemblyInfo version
+        shell: pwsh
+        run: |
+          $version = "${{ github.event.inputs.version }}"
+          $assemblyInfoPath = "foxhole-artillery-calculator/Properties/AssemblyInfo.cs"
+          
+          # .NET AssemblyVersion requires 4 components (Major.Minor.Build.Revision)
+          # We append .0 as the revision number to the user-provided X.Y.Z version
+          $content = Get-Content $assemblyInfoPath -Raw
+          $content = $content -replace '\[assembly: AssemblyVersion\(".*?"\)\]', "[assembly: AssemblyVersion(`"$version.0`")]"
+          $content = $content -replace '\[assembly: AssemblyFileVersion\(".*?"\)\]', "[assembly: AssemblyFileVersion(`"$version.0`")]"
+          Set-Content $assemblyInfoPath -Value $content -NoNewline
+          
+          Write-Host "Updated version to $version.0"
+      
+      - name: Build solution
+        run: msbuild foxhole-artillery-calculator/foxhole-artillery-calculator.sln /p:Configuration=Release /p:Platform="Any CPU" /p:OutputPath=bin\Release
+      
+      - name: Create release directory
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path release -Force
+          
+          # The executable name is defined in the .csproj as AssemblyName
+          # Copy the main executable (supports both Cyrillic and ASCII names)
+          $binPath = "foxhole-artillery-calculator/bin/Release"
+          $exeFiles = Get-ChildItem -Path $binPath -Filter "*.exe" -File
+          
+          if ($exeFiles.Count -eq 0) {
+            Write-Error "No executable found in $binPath"
+            exit 1
+          }
+          
+          # Copy the first (and should be only) executable with a normalized name
+          Copy-Item $exeFiles[0].FullName -Destination "release/foxhole-artillery-calculator.exe"
+          Write-Host "Copied $($exeFiles[0].Name) to release/foxhole-artillery-calculator.exe"
+          
+          # Copy dependencies if they exist
+          $dependencies = @("*.dll", "*.config")
+          foreach ($dep in $dependencies) {
+            Get-ChildItem -Path $binPath -Filter $dep -File | ForEach-Object {
+              Copy-Item $_.FullName -Destination "release/"
+            }
+          }
+      
+      - name: Create ZIP archive
+        shell: pwsh
+        run: |
+          $version = "${{ github.event.inputs.version }}"
+          Compress-Archive -Path release/* -DestinationPath "foxhole-artillery-calculator-v$version.zip"
+      
+      - name: Create and push tag
+        shell: pwsh
+        run: |
+          $version = "${{ github.event.inputs.version }}"
+          $tag = "v$version"
+          
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git tag -a $tag -m "Release $version"
+          git push origin $tag
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ github.event.inputs.version }}
+          name: Release v${{ github.event.inputs.version }}
+          body: |
+            ## Foxhole Artillery Calculator v${{ github.event.inputs.version }}
+            
+            ### Установка
+            1. Скачайте архив `foxhole-artillery-calculator-v${{ github.event.inputs.version }}.zip`
+            2. Распакуйте архив в любую папку
+            3. Запустите `foxhole-artillery-calculator.exe`
+            
+            ### Installation
+            1. Download `foxhole-artillery-calculator-v${{ github.event.inputs.version }}.zip`
+            2. Extract to any folder
+            3. Run `foxhole-artillery-calculator.exe`
+          draft: false
+          prerelease: false
+          files: |
+            foxhole-artillery-calculator-v${{ github.event.inputs.version }}.zip
+            release/foxhole-artillery-calculator.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
