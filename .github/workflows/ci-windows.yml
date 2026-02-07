@@ -23,19 +23,12 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
-      - name: Setup NuGet
-        uses: nuget/setup-nuget@v2
-
-      - name: Restore NuGet packages
-        run: nuget restore foxhole-artillery-calculator/foxhole-artillery-calculator.sln -PackagesDirectory ./packages
-
       - name: Build solution (${{ matrix.configuration }})
         run: |
           msbuild foxhole-artillery-calculator/foxhole-artillery-calculator.sln `
             /p:Configuration=${{ matrix.configuration }} `
             /p:Platform="Any CPU" `
             /p:OutputPath=bin\${{ matrix.configuration }} `
-            /p:SolutionDir=$PWD\foxhole-artillery-calculator\ `
             /v:minimal
 
       - name: Verify build output
