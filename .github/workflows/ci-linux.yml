@@ -1,0 +1,162 @@
+name: CI - Linux Code Checks
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  code-quality:
+    name: Code Quality Checks (Linux)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for trailing whitespace
+        run: |
+          echo "Checking for trailing whitespace..."
+          if git grep -I --line-number --extended-regexp '\s+$' -- '*.cs' '*.xaml' '*.yml' '*.yaml' '*.md'; then
+            echo "⚠️ Warning: Found trailing whitespace in the files above"
+            echo "Note: This is currently non-blocking. Consider fixing in a future PR."
+          else
+            echo "✅ No trailing whitespace found"
+          fi
+
+      - name: Validate YAML files
+        run: |
+          echo "Validating YAML files..."
+
+          # Install yamllint
+          sudo apt-get update
+          sudo apt-get install -y yamllint
+
+          # Create yamllint config
+          cat > .yamllint.yml << 'EOF'
+          extends: default
+          rules:
+            line-length:
+              max: 120
+              level: warning
+            document-start: disable
+            comments:
+              min-spaces-from-content: 1
+          EOF
+
+          # Validate workflow files
+          if ls .github/workflows/*.yml 1> /dev/null 2>&1; then
+            echo "Checking workflow files..."
+            yamllint -c .yamllint.yml .github/workflows/*.yml || echo "⚠️ YAML formatting warnings (non-blocking)"
+          fi
+
+          # Validate example config
+          if [ -f "config.yaml.example" ]; then
+            echo "Validating config.yaml.example..."
+            yamllint -c .yamllint.yml config.yaml.example || echo "⚠️ YAML formatting warnings (non-blocking)"
+          fi
+
+          echo "✅ YAML validation completed"
+
+      - name: Check file structure
+        run: |
+          echo "Checking required files..."
+
+          required_files=(
+            "README.md"
+            "LICENSE"
+            ".gitignore"
+            "foxhole-artillery-calculator/foxhole-artillery-calculator.sln"
+            "foxhole-artillery-calculator/foxhole-artillery-calculator.csproj"
+          )
+
+          missing_files=()
+          for file in "${required_files[@]}"; do
+            if [ ! -f "$file" ]; then
+              missing_files+=("$file")
+            fi
+          done
+
+          if [ ${#missing_files[@]} -eq 0 ]; then
+            echo "✅ All required files present"
+          else
+            echo "❌ Missing required files:"
+            printf '%s\n' "${missing_files[@]}"
+            exit 1
+          fi
+
+      - name: Check C# file syntax
+        run: |
+          echo "Checking C# files for basic syntax issues..."
+
+          # Check for obvious syntax errors
+          cs_files=$(find foxhole-artillery-calculator -name "*.cs" -type f)
+
+          for file in $cs_files; do
+            # Check for unmatched braces (basic check)
+            open_braces=$(grep -o '{' "$file" | wc -l)
+            close_braces=$(grep -o '}' "$file" | wc -l)
+
+            if [ $open_braces -ne $close_braces ]; then
+              echo "⚠️ Warning: Unmatched braces in $file"
+            fi
+          done
+
+          echo "✅ Basic C# syntax check completed"
+
+      - name: Verify NuGet packages configuration
+        run: |
+          echo "Checking NuGet packages.config..."
+
+          if [ -f "foxhole-artillery-calculator/packages.config" ]; then
+            # Validate XML structure
+            if xmllint --noout foxhole-artillery-calculator/packages.config 2>/dev/null; then
+              echo "✅ packages.config is valid XML"
+            else
+              echo "❌ packages.config has XML syntax errors"
+              exit 1
+            fi
+
+            # Check for YamlDotNet package
+            if grep -q "YamlDotNet" foxhole-artillery-calculator/packages.config; then
+              echo "✅ YamlDotNet package reference found"
+            else
+              echo "⚠️ Warning: YamlDotNet package not found"
+            fi
+          else
+            echo "⚠️ Warning: packages.config not found"
+          fi
+
+      - name: Check documentation
+        run: |
+          echo "Checking documentation..."
+
+          # Check README has substantial content
+          if [ -f "README.md" ]; then
+            readme_lines=$(wc -l < README.md)
+            if [ $readme_lines -gt 10 ]; then
+              echo "✅ README.md has substantial content ($readme_lines lines)"
+            else
+              echo "⚠️ Warning: README.md seems too short"
+            fi
+          fi
+
+          # Check for configuration documentation
+          if grep -q "config.yaml" README.md 2>/dev/null; then
+            echo "✅ Configuration documentation found in README"
+          else
+            echo "⚠️ Warning: No configuration documentation in README"
+          fi
+
+      - name: Summary
+        if: always()
+        run: |
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "✅ Linux code quality checks completed!"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          echo "These checks run on Linux for fast, cheap feedback."
+          echo "For compilation verification, see the Windows build workflow."

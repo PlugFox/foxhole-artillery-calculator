@@ -393,3 +393,7 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# Configuration files (user-specific)
+config.yaml
+error.log
+
