@@ -45,23 +45,32 @@ PrtScr
 
 ## Конфигурация / Configuration
 
-С версии 2.0 калькулятор поддерживает настройку через конфигурационный файл `config.yaml`. При первом запуске файл создается автоматически со значениями по умолчанию.
+С версии 2.0 калькулятор поддерживает настройку через конфигурационный файл `config.ini`. При первом запуске файл создается автоматически со значениями по умолчанию.
 
 **Расположение файла конфигурации / Configuration file location:**
-- Windows: `%APPDATA%\FoxholeArtilleryCalculator\config.yaml`
+- Windows: `%APPDATA%\FoxholeArtilleryCalculator\config.ini`
 - Полный путь отображается при ошибке загрузки конфигурации
+
+### Формат конфигурации / Configuration Format
+
+Файл использует простой INI формат с секциями и параметрами:
+
+```ini
+[Section]
+parameter = value
+```
 
 ### Настройка хоткеев / Hotkey Configuration
 
-В файле `config.yaml` можно изменить хоткеи для различных действий:
+В файле `config.ini` можно изменить хоткеи для различных действий:
 
-```yaml
-hotkeys:
-  enemy_coordinates: SUBTRACT      # Ввод координат противника (по умолчанию Num -)
-  friendly_coordinates: ADD        # Ввод координат союзника (по умолчанию Num +)
-  screenshot: SNAPSHOT             # Снимок экрана (по умолчанию PrtScr)
-  change_resolution: MULTIPLY      # Смена разрешения (по умолчанию Num *)
-  toggle_window: DECIMAL           # Свернуть/развернуть (по умолчанию Num .)
+```ini
+[Hotkeys]
+enemy_coordinates = SUBTRACT      # Ввод координат противника (по умолчанию Num -)
+friendly_coordinates = ADD        # Ввод координат союзника (по умолчанию Num +)
+screenshot = SNAPSHOT             # Снимок экрана (по умолчанию PrtScr)
+change_resolution = MULTIPLY      # Смена разрешения (по умолчанию Num *)
+toggle_window = DECIMAL           # Свернуть/развернуть (по умолчанию Num .)
 ```
 
 **Доступные клавиши / Available keys:**
@@ -77,40 +86,42 @@ hotkeys:
 
 ### Настройка интерфейса / UI Configuration
 
-```yaml
-ui:
-  active_field_color: Lime         # Цвет активного поля ввода
-  in_range_color: "#7F00FF00"      # Цвет для артиллерии в радиусе действия
-  out_of_range_color: "#7FFF0000"  # Цвет для артиллерии вне радиуса
-  enable_sound: true               # Включить озвучку координат
-  voice_culture: en-US             # Язык озвучки (en-US, ru-RU и др.)
+```ini
+[UI]
+active_field_color = Lime         # Цвет активного поля ввода
+in_range_color = #7F00FF00        # Цвет для артиллерии в радиусе действия
+out_of_range_color = #7FFF0000    # Цвет для артиллерии вне радиуса
+enable_sound = true               # Включить озвучку координат
+voice_culture = en-US             # Язык озвучки (en-US, ru-RU и др.)
 ```
 
 ### Настройка дальности артиллерии / Artillery Range Configuration
 
-```yaml
-artillery:
-  mortar:
-    min_range: 44
-    max_range: 66
-  field_artillery:
-    min_range: 74
-    max_range: 151
-  howitzer:
-    min_range: 59
-    max_range: 166
-  gunship:
-    min_range: 49
-    max_range: 101
+```ini
+[Mortar]
+min_range = 44
+max_range = 66
+
+[FieldArtillery]
+min_range = 74
+max_range = 151
+
+[Howitzer]
+min_range = 59
+max_range = 166
+
+[Gunship]
+min_range = 49
+max_range = 101
 ```
 
 ### Общие настройки / General Settings
 
-```yaml
-general:
-  beep_on_field_change: false      # Звуковой сигнал при смене поля ввода
-  screenshot_width: 100            # Ширина снимка экрана в пикселях
-  screenshot_height: 50            # Высота снимка экрана в пикселях
+```ini
+[General]
+beep_on_field_change = false      # Звуковой сигнал при смене поля ввода
+screenshot_width = 100            # Ширина снимка экрана в пикселях
+screenshot_height = 50            # Высота снимка экрана в пикселях
 ```
 
 ---
@@ -151,12 +162,10 @@ To create a new release using GitHub Actions:
 - Проверка синтаксиса YAML файлов
 - Валидация структуры файлов проекта
 - Проверка базового синтаксиса C#
-- Проверка конфигурации NuGet пакетов
 - Проверка документации
 
 ### Windows Build Verification (проверка компиляции)
 - Сборка Debug и Release конфигураций
-- Проверка NuGet зависимостей
 - Проверка выходных файлов (exe, dll)
 - Артефакты сборки доступны в Actions
 
@@ -166,11 +175,9 @@ The repository uses automated code checks for every Pull Request and commit to m
 - YAML syntax validation
 - Project file structure verification
 - Basic C# syntax checking
-- NuGet packages configuration check
 - Documentation validation
 
 ### Windows Build Verification (compilation check)
 - Build Debug and Release configurations
-- Verify NuGet dependencies
 - Check build output files (exe, dll)
 - Build artifacts available in Actions
