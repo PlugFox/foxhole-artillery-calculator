@@ -4,6 +4,10 @@ Foxhole
 
 ![](screenshots/5.png)
 
+## Управление / Controls
+
+### Хоткеи по умолчанию / Default Hotkeys
+
 ```
 Num -
  Инициация ввода координат противника  
@@ -33,6 +37,78 @@ PrtScr
 + Если на данный момент кальк не нужен - можно "свернуть" в полосочку по стрелочкам в шапочке, чтоб не мешался.  
 + Подсветка возможности ведения ответного огня  
 + В шапке есть кнопка для открытия дополнительной полезной информации.
+
+---
+
+## Конфигурация / Configuration
+
+С версии 2.0 калькулятор поддерживает настройку через конфигурационный файл `config.yaml`. При первом запуске файл создается автоматически со значениями по умолчанию.
+
+**Расположение файла конфигурации / Configuration file location:**
+- Windows: `%APPDATA%\FoxholeArtilleryCalculator\config.yaml`
+- Полный путь отображается при ошибке загрузки конфигурации
+
+### Настройка хоткеев / Hotkey Configuration
+
+В файле `config.yaml` можно изменить хоткеи для различных действий:
+
+```yaml
+hotkeys:
+  enemy_coordinates: SUBTRACT      # Ввод координат противника (по умолчанию Num -)
+  friendly_coordinates: ADD        # Ввод координат союзника (по умолчанию Num +)
+  screenshot: SNAPSHOT             # Снимок экрана (по умолчанию PrtScr)
+  change_resolution: MULTIPLY      # Смена разрешения (по умолчанию Num *)
+  toggle_window: DECIMAL           # Свернуть/развернуть (по умолчанию Num .)
+```
+
+**Доступные клавиши / Available keys:**
+- Клавиши Numpad: `NUMPAD0-NUMPAD9`, `ADD`, `SUBTRACT`, `MULTIPLY`, `DIVIDE`, `DECIMAL`
+- Функциональные клавиши: `F1-F24`
+- Специальные: `SNAPSHOT` (PrtScr), `INSERT`, `DELETE`, `HOME`, `END`, `PRIOR` (PageUp), `NEXT` (PageDown)
+- Буквы: `KEY_A` через `KEY_Z`
+- Цифры: `KEY_0` через `KEY_9`
+- Стрелки: `UP`, `DOWN`, `LEFT`, `RIGHT`
+- Другие: `SPACE`, `RETURN` (Enter), `ESCAPE`, `TAB`, `BACK` (Backspace)
+
+Полный список доступных клавиш смотрите в файле `classes/KeyboardHook.cs`
+
+### Настройка интерфейса / UI Configuration
+
+```yaml
+ui:
+  active_field_color: Lime         # Цвет активного поля ввода
+  in_range_color: "#7F00FF00"      # Цвет для артиллерии в радиусе действия
+  out_of_range_color: "#7FFF0000"  # Цвет для артиллерии вне радиуса
+  enable_sound: true               # Включить озвучку координат
+  voice_culture: en-US             # Язык озвучки (en-US, ru-RU и др.)
+```
+
+### Настройка дальности артиллерии / Artillery Range Configuration
+
+```yaml
+artillery:
+  mortar:
+    min_range: 44
+    max_range: 66
+  field_artillery:
+    min_range: 74
+    max_range: 151
+  howitzer:
+    min_range: 59
+    max_range: 166
+  gunship:
+    min_range: 49
+    max_range: 101
+```
+
+### Общие настройки / General Settings
+
+```yaml
+general:
+  beep_on_field_change: false      # Звуковой сигнал при смене поля ввода
+  screenshot_width: 100            # Ширина снимка экрана в пикселях
+  screenshot_height: 50            # Высота снимка экрана в пикселях
+```
 
 ---
 
