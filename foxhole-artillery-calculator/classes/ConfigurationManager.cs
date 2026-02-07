@@ -68,8 +68,8 @@ namespace foxhole_artillery_calculator.classes
             }
             catch (Exception ex)
             {
-                // If there's an error loading config, log it and return defaults
-                System.Diagnostics.Debug.WriteLine($"Error loading configuration: {ex.Message}");
+                // Log error to file for troubleshooting
+                LogError("Error loading configuration", ex);
                 return new AppConfiguration();
             }
         }
@@ -118,7 +118,27 @@ namespace foxhole_artillery_calculator.classes
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error saving configuration: {ex.Message}");
+                // Log error to file for troubleshooting
+                LogError("Error saving configuration", ex);
+            }
+        }
+
+        /// <summary>
+        /// Logs error to a file for troubleshooting
+        /// </summary>
+        private static void LogError(string message, Exception ex)
+        {
+            try
+            {
+                string directory = Path.GetDirectoryName(ConfigFilePath);
+                string logFilePath = Path.Combine(directory, "error.log");
+                string logMessage = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {message}: {ex.Message}\n{ex.StackTrace}\n\n";
+                File.AppendAllText(logFilePath, logMessage);
+            }
+            catch
+            {
+                // If we can't log, just fail silently - this is a best-effort logging
+                System.Diagnostics.Debug.WriteLine($"{message}: {ex.Message}");
             }
         }
 

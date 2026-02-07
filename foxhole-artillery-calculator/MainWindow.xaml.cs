@@ -152,8 +152,9 @@ namespace foxhole_artillery_calculator
                 {
                     activeColor = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(config.UI.ActiveFieldColor);
                 }
-                catch
+                catch (Exception ex)
                 {
+                    System.Diagnostics.Debug.WriteLine($"Invalid active field color '{config.UI.ActiveFieldColor}': {ex.Message}");
                     activeColor = Colors.Lime;
                 }
                 
@@ -187,8 +188,9 @@ namespace foxhole_artillery_calculator
                     colorGreen = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(config.UI.InRangeColor);
                     colorRed = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(config.UI.OutOfRangeColor);
                 }
-                catch
+                catch (Exception ex)
                 {
+                    System.Diagnostics.Debug.WriteLine($"Invalid range colors: {ex.Message}");
                     colorGreen = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#7F00FF00");
                     colorRed = (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString("#7FFF0000");
                 }
@@ -586,8 +588,9 @@ namespace foxhole_artillery_calculator
                         {
                             synth.SelectVoiceByHints(VoiceGender.Neutral, VoiceAge.NotSet, 0, CultureInfo.GetCultureInfo(config.UI.VoiceCulture));
                         }
-                        catch
+                        catch (Exception voiceEx)
                         {
+                            System.Diagnostics.Debug.WriteLine($"Voice culture '{config.UI.VoiceCulture}' not available: {voiceEx.Message}");
                             // Fallback to en-US if configured culture is not available
                             synth.SelectVoiceByHints(VoiceGender.Neutral, VoiceAge.NotSet, 0, CultureInfo.GetCultureInfo("en-US"));
                         }
