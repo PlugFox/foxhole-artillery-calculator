@@ -98,10 +98,7 @@ namespace foxhole_artillery_calculator
             }
             catch (Exception ex)
             {
-                string configPath = ConfigurationManager.GetConfigFilePath();
-                string errorDetails = ex.InnerException != null ? $"\n\nПодробности: {ex.InnerException.Message}" : "";
-                MessageBox.Show($"Ошибка загрузки хоткеев из конфигурации:\n{ex.Message}\n\nФайл конфигурации: {configPath}{errorDetails}\n\nИспользуются значения по умолчанию.", 
-                    "Ошибка конфигурации", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(FormatConfigurationErrorMessage(ex), "Ошибка конфигурации", MessageBoxButton.OK, MessageBoxImage.Warning);
                 // Fallback to defaults
                 enemyCoordinatesHotkey = KeyboardHook.VKeys.SUBTRACT;
                 friendlyCoordinatesHotkey = KeyboardHook.VKeys.ADD;
@@ -120,6 +117,16 @@ namespace foxhole_artillery_calculator
 
             // Обновим интерфейс
             UpdateInterface();
+        }
+
+        /// <summary>
+        /// Formats configuration error message with details
+        /// </summary>
+        private string FormatConfigurationErrorMessage(Exception ex)
+        {
+            string configPath = ConfigurationManager.GetConfigFilePath();
+            string errorDetails = ex.InnerException != null ? $"\n\nПодробности: {ex.InnerException.Message}" : "";
+            return $"Ошибка загрузки хоткеев из конфигурации:\n{ex.Message}\n\nФайл конфигурации: {configPath}{errorDetails}\n\nИспользуются значения по умолчанию.";
         }
 
         #region Интерфейс
@@ -187,7 +194,7 @@ namespace foxhole_artillery_calculator
                 }
                 
                 // Мортира
-                if (config.Artillery.Mortar.MinRange < targetDistance && targetDistance < config.Artillery.Mortar.MaxRange)
+                if (config.Artillery.Mortar.MinRange <= targetDistance && targetDistance <= config.Artillery.Mortar.MaxRange)
                 {
                     Mortar.Background = new SolidColorBrush(colorGreen);
                 } else
@@ -195,7 +202,7 @@ namespace foxhole_artillery_calculator
                     Mortar.Background = new SolidColorBrush(colorRed);
                 }
                 // Артилерия
-                if (config.Artillery.FieldArtillery.MinRange < targetDistance && targetDistance < config.Artillery.FieldArtillery.MaxRange)
+                if (config.Artillery.FieldArtillery.MinRange <= targetDistance && targetDistance <= config.Artillery.FieldArtillery.MaxRange)
                 {
                     FieldArtillery.Background = new SolidColorBrush(colorGreen);
                 }
@@ -204,7 +211,7 @@ namespace foxhole_artillery_calculator
                     FieldArtillery.Background = new SolidColorBrush(colorRed);
                 }
                 // Хова с учетом разброса
-                if (config.Artillery.Howitzer.MinRange < targetDistance && targetDistance < config.Artillery.Howitzer.MaxRange)
+                if (config.Artillery.Howitzer.MinRange <= targetDistance && targetDistance <= config.Artillery.Howitzer.MaxRange)
                 {
                     Howitzer.Background = new SolidColorBrush(colorGreen);
                 }
@@ -213,7 +220,7 @@ namespace foxhole_artillery_calculator
                     Howitzer.Background = new SolidColorBrush(colorRed);
                 }
                 // Ганбоат
-                if (config.Artillery.Gunship.MinRange < targetDistance && targetDistance < config.Artillery.Gunship.MaxRange)
+                if (config.Artillery.Gunship.MinRange <= targetDistance && targetDistance <= config.Artillery.Gunship.MaxRange)
                 {
                     Gunship.Background = new SolidColorBrush(colorGreen);
                 }

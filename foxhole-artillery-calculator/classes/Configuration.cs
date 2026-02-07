@@ -115,25 +115,25 @@ namespace foxhole_artillery_calculator.classes
         /// Mortar range
         /// </summary>
         [YamlMember(Alias = "mortar")]
-        public RangeConfiguration Mortar { get; set; } = new RangeConfiguration { MinRange = 44, MaxRange = 66 };
+        public RangeConfiguration Mortar { get; set; } = RangeConfiguration.CreateMortarDefault();
 
         /// <summary>
         /// Field Artillery range
         /// </summary>
         [YamlMember(Alias = "field_artillery")]
-        public RangeConfiguration FieldArtillery { get; set; } = new RangeConfiguration { MinRange = 74, MaxRange = 151 };
+        public RangeConfiguration FieldArtillery { get; set; } = RangeConfiguration.CreateFieldArtilleryDefault();
 
         /// <summary>
         /// Howitzer range
         /// </summary>
         [YamlMember(Alias = "howitzer")]
-        public RangeConfiguration Howitzer { get; set; } = new RangeConfiguration { MinRange = 59, MaxRange = 166 };
+        public RangeConfiguration Howitzer { get; set; } = RangeConfiguration.CreateHowitzerDefault();
 
         /// <summary>
         /// Gunship range
         /// </summary>
         [YamlMember(Alias = "gunship")]
-        public RangeConfiguration Gunship { get; set; } = new RangeConfiguration { MinRange = 49, MaxRange = 101 };
+        public RangeConfiguration Gunship { get; set; } = RangeConfiguration.CreateGunshipDefault();
     }
 
     /// <summary>
@@ -152,6 +152,40 @@ namespace foxhole_artillery_calculator.classes
         /// </summary>
         [YamlMember(Alias = "max_range")]
         public double MaxRange { get; set; }
+
+        // Default range constants
+        private const double MORTAR_MIN = 44;
+        private const double MORTAR_MAX = 66;
+        private const double FIELD_ARTILLERY_MIN = 74;
+        private const double FIELD_ARTILLERY_MAX = 151;
+        private const double HOWITZER_MIN = 59;
+        private const double HOWITZER_MAX = 166;
+        private const double GUNSHIP_MIN = 49;
+        private const double GUNSHIP_MAX = 101;
+
+        /// <summary>
+        /// Creates default Mortar range configuration
+        /// </summary>
+        public static RangeConfiguration CreateMortarDefault() => 
+            new RangeConfiguration { MinRange = MORTAR_MIN, MaxRange = MORTAR_MAX };
+
+        /// <summary>
+        /// Creates default Field Artillery range configuration
+        /// </summary>
+        public static RangeConfiguration CreateFieldArtilleryDefault() => 
+            new RangeConfiguration { MinRange = FIELD_ARTILLERY_MIN, MaxRange = FIELD_ARTILLERY_MAX };
+
+        /// <summary>
+        /// Creates default Howitzer range configuration
+        /// </summary>
+        public static RangeConfiguration CreateHowitzerDefault() => 
+            new RangeConfiguration { MinRange = HOWITZER_MIN, MaxRange = HOWITZER_MAX };
+
+        /// <summary>
+        /// Creates default Gunship range configuration
+        /// </summary>
+        public static RangeConfiguration CreateGunshipDefault() => 
+            new RangeConfiguration { MinRange = GUNSHIP_MIN, MaxRange = GUNSHIP_MAX };
     }
 
     /// <summary>
