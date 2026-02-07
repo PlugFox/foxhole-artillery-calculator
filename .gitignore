@@ -395,4 +395,5 @@ $RECYCLE.BIN/
 
 # Configuration files (user-specific)
 config.yaml
+error.log
 
