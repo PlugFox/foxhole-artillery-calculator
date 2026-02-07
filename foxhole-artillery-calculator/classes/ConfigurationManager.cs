@@ -109,7 +109,7 @@ namespace foxhole_artillery_calculator.classes
                     case "mortar":
                         ApplyRangeValue(config.Artillery.Mortar, key, value);
                         break;
-                    case "field_artillery":
+                    case "fieldartillery":
                         ApplyRangeValue(config.Artillery.FieldArtillery, key, value);
                         break;
                     case "howitzer":
@@ -224,7 +224,7 @@ namespace foxhole_artillery_calculator.classes
                     writer.WriteLine("max_range = " + config.Artillery.Mortar.MaxRange.ToString(CultureInfo.InvariantCulture));
                     writer.WriteLine();
 
-                    writer.WriteLine("[Field_Artillery]");
+                    writer.WriteLine("[FieldArtillery]");
                     writer.WriteLine("min_range = " + config.Artillery.FieldArtillery.MinRange.ToString(CultureInfo.InvariantCulture));
                     writer.WriteLine("max_range = " + config.Artillery.FieldArtillery.MaxRange.ToString(CultureInfo.InvariantCulture));
                     writer.WriteLine();
