@@ -35,6 +35,7 @@ jobs:
             /p:Configuration=${{ matrix.configuration }} `
             /p:Platform="Any CPU" `
             /p:OutputPath=bin\${{ matrix.configuration }} `
+            /p:SolutionDir=$PWD\foxhole-artillery-calculator\ `
             /v:minimal
 
       - name: Verify build output
