@@ -12,6 +12,8 @@ jobs:
   create-release:
     name: Create Release and Build Windows Executable
     runs-on: windows-latest
+    permissions:
+      contents: write
     
     steps:
       - name: Checkout code
@@ -56,6 +58,8 @@ jobs:
           $version = "${{ github.event.inputs.version }}"
           $assemblyInfoPath = "foxhole-artillery-calculator/Properties/AssemblyInfo.cs"
           
+          # .NET AssemblyVersion requires 4 components (Major.Minor.Build.Revision)
+          # We append .0 as the revision number to the user-provided X.Y.Z version
           $content = Get-Content $assemblyInfoPath -Raw
           $content = $content -replace '\[assembly: AssemblyVersion\(".*?"\)\]', "[assembly: AssemblyVersion(`"$version.0`")]"
           $content = $content -replace '\[assembly: AssemblyFileVersion\(".*?"\)\]', "[assembly: AssemblyFileVersion(`"$version.0`")]"
@@ -70,10 +74,22 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Path release -Force
-          Copy-Item "foxhole-artillery-calculator/bin/Release/Калькулятор артиллериста.exe" -Destination "release/foxhole-artillery-calculator.exe"
+          
+          # The executable name is defined in the .csproj as AssemblyName
+          # Copy the main executable (supports both Cyrillic and ASCII names)
+          $binPath = "foxhole-artillery-calculator/bin/Release"
+          $exeFiles = Get-ChildItem -Path $binPath -Filter "*.exe" -File
+          
+          if ($exeFiles.Count -eq 0) {
+            Write-Error "No executable found in $binPath"
+            exit 1
+          }
+          
+          # Copy the first (and should be only) executable with a normalized name
+          Copy-Item $exeFiles[0].FullName -Destination "release/foxhole-artillery-calculator.exe"
+          Write-Host "Copied $($exeFiles[0].Name) to release/foxhole-artillery-calculator.exe"
           
           # Copy dependencies if they exist
-          $binPath = "foxhole-artillery-calculator/bin/Release"
           $dependencies = @("*.dll", "*.config")
           foreach ($dep in $dependencies) {
             Get-ChildItem -Path $binPath -Filter $dep -File | ForEach-Object {
