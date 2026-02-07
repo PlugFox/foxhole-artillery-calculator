@@ -2,6 +2,9 @@ Foxhole
 ---
 # Калькулятор артиллериста
 
+![CI - Linux](https://github.com/PlugFox/foxhole-artillery-calculator/workflows/CI%20-%20Linux%20Code%20Checks/badge.svg)
+![CI - Windows](https://github.com/PlugFox/foxhole-artillery-calculator/workflows/CI%20-%20Windows%20Build/badge.svg)
+
 ![](screenshots/5.png)
 
 ## Управление / Controls
