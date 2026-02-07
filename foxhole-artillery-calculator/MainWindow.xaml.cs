@@ -98,7 +98,10 @@ namespace foxhole_artillery_calculator
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка загрузки хоткеев из конфигурации: {ex.Message}\n\nИспользуются значения по умолчанию.", "Ошибка конфигурации", MessageBoxButton.OK, MessageBoxImage.Warning);
+                string configPath = ConfigurationManager.GetConfigFilePath();
+                string errorDetails = ex.InnerException != null ? $"\n\nПодробности: {ex.InnerException.Message}" : "";
+                MessageBox.Show($"Ошибка загрузки хоткеев из конфигурации:\n{ex.Message}\n\nФайл конфигурации: {configPath}{errorDetails}\n\nИспользуются значения по умолчанию.", 
+                    "Ошибка конфигурации", MessageBoxButton.OK, MessageBoxImage.Warning);
                 // Fallback to defaults
                 enemyCoordinatesHotkey = KeyboardHook.VKeys.SUBTRACT;
                 friendlyCoordinatesHotkey = KeyboardHook.VKeys.ADD;
