@@ -27,9 +27,7 @@ jobs:
         uses: nuget/setup-nuget@v2
 
       - name: Restore NuGet packages
-        run: |
-          cd foxhole-artillery-calculator
-          nuget restore foxhole-artillery-calculator.sln
+        run: nuget restore foxhole-artillery-calculator/foxhole-artillery-calculator.sln -SolutionDirectory .
 
       - name: Build solution (${{ matrix.configuration }})
         run: |
